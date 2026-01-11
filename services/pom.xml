@@ -16,7 +16,7 @@
 	<description>Parent pom</description>
 
 	<modules>
-		<module>api-service</module>
+		<module>app-service</module>
 	</modules>
 
 	<properties>

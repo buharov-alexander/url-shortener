@@ -9,10 +9,10 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.bukharov.url-shortener</groupId>
-	<artifactId>api-service</artifactId>
+	<artifactId>app-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>api-service</name>
-	<description>API service of URL Shortener</description>
+	<name>app-service</name>
+	<description>APP service of URL Shortener</description>
 
 	<dependencies>
 		<dependency>

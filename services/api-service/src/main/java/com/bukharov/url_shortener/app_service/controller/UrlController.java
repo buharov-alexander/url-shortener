@@ -1,4 +1,4 @@
-package com.bukharov.url_shortener.api_service.controller;
+package com.bukharov.url_shortener.app_service.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

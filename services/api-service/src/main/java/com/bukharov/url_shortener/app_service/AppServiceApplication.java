@@ -1,13 +1,13 @@
-package com.bukharov.url_shortener.api_service;
+package com.bukharov.url_shortener.app_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApiServiceApplication {
+public class AppServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiServiceApplication.class, args);
+		SpringApplication.run(AppServiceApplication.class, args);
 	}
 
 }

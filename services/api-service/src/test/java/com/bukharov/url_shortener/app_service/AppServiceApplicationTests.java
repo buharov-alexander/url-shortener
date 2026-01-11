@@ -1,10 +1,10 @@
-package com.bukharov.url_shortener.api_service;
+package com.bukharov.url_shortener.app_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApiServiceApplicationTests {
+class AppServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
