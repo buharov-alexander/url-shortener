@@ -1,0 +1,10 @@
+services:
+    app-service:
+      image: buharovalexander/url-shortener-app-service:latest
+      build:
+        context: ./services/app-service
+        dockerfile: Dockerfile
+      labels:
+        - "logging=enabled"
+      ports:
+        - "8081:8080"
