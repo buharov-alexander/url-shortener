@@ -18,11 +18,11 @@ public class UrlController {
 
 	@PostMapping("/shorten")
 	public UrlDTO shortenUrl(@RequestBody UrlDTO urlDTO) {
-		return new UrlDTO(urlService.shortenUrl(urlDTO.url()));
+		return new UrlDTO(urlService.saveUniqueCode(urlDTO.url()));
 	}
 
-	@GetMapping("/{shortCode}")
-	public UrlDTO redirectToOriginalUrl(@PathVariable String shortCode) {
-		return new UrlDTO(urlService.getOriginalUrl(shortCode));
+	@GetMapping("/{uniqueCode}")
+	public UrlDTO redirectToOriginalUrl(@PathVariable String uniqueCode) {
+		return new UrlDTO(urlService.getByUniqueCode(uniqueCode));
 	}
 }
