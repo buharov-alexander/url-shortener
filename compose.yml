@@ -14,5 +14,12 @@ services:
       depends_on:
         - app-service
       networks: [appnet]
+    cassandra:
+      image: cassandra:latest
+      environment:
+        - CASSANDRA_CLUSTER_NAME=UrlShortenerCluster
+      ports:
+        - "9042:9042"
+      networks: [appnet]
 networks:
   appnet:

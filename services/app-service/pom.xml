@@ -27,18 +27,11 @@
 			<version>2.6.0</version>
 		</dependency>
 
-		<!-- PostgreSQL -->
+		<!-- Cassandra -->
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<!-- Lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<groupId>org.apache.cassandra</groupId>
+			<artifactId>java-driver-core</artifactId>
+			<version>4.19.2</version>
 		</dependency>
 
 		<!-- Actuator & Micrometer -->
