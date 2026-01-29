@@ -20,6 +20,8 @@ services:
         - CASSANDRA_CLUSTER_NAME=UrlShortenerCluster
       ports:
         - "9042:9042"
+      volumes:
+        - .setup/cassandra/init.cql:/docker-entrypoint-initdb.d/init.cql
       networks: [appnet]
 networks:
   appnet:
