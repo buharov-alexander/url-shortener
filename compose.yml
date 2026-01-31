@@ -1,10 +1,4 @@
 services:
-    app-service:
-      image: buharovalexander/url-shortener-app-service:latest
-      build:
-        context: ./services/app-service
-        dockerfile: Dockerfile
-      networks: [appnet]
     nginx:
       image: nginx:latest
       ports:
@@ -22,6 +16,23 @@ services:
         - "9042:9042"
       volumes:
         - .setup/cassandra/init.cql:/docker-entrypoint-initdb.d/init.cql
+      networks: [appnet]
+      healthcheck:
+        test: ["CMD-SHELL", "cqlsh -e 'describe keyspaces'"]
+        interval: 10s
+        timeout: 5s
+        retries: 12
+    app-service:
+      image: buharovalexander/url-shortener-app-service:latest
+      build:
+        context: ./services/app-service
+        dockerfile: Dockerfile
+      depends_on:
+        cassandra:
+          condition: service_healthy
+      environment:
+        - CASSANDRA_CONTACT_POINTS=cassandra
+        - CASSANDRA_PORT=9042
       networks: [appnet]
 networks:
   appnet:
