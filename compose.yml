@@ -14,22 +14,30 @@ services:
         - CASSANDRA_CLUSTER_NAME=UrlShortenerCluster
       ports:
         - "9042:9042"
-      volumes:
-        - .setup/cassandra/init.cql:/docker-entrypoint-initdb.d/init.cql
       networks: [appnet]
       healthcheck:
         test: ["CMD-SHELL", "cqlsh -e 'describe keyspaces'"]
         interval: 10s
         timeout: 5s
         retries: 12
+    cassandra-init:
+      image: cassandra:latest
+      depends_on:
+        cassandra:
+          condition: service_healthy
+      volumes:
+        - ./setup/cassandra/init.cql:/init.cql
+      command: >
+        sh -c "cqlsh cassandra 9042 -f /init.cql"
+      networks: [appnet]
     app-service:
       image: buharovalexander/url-shortener-app-service:latest
       build:
         context: ./services/app-service
         dockerfile: Dockerfile
       depends_on:
-        cassandra:
-          condition: service_healthy
+        cassandra-init:
+          condition: service_completed_successfully
       environment:
         - CASSANDRA_CONTACT_POINTS=cassandra
         - CASSANDRA_PORT=9042
