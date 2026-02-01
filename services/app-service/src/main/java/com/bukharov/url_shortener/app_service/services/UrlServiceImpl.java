@@ -1,5 +1,7 @@
 package com.bukharov.url_shortener.app_service.services;
 
+import java.util.UUID;
+
 import com.bukharov.url_shortener.app_service.repository.UrlEntity;
 import com.bukharov.url_shortener.app_service.repository.UrlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ class UrlServiceImpl implements UrlService {
 	public String saveUniqueCode(String originalUrl) {
 		String uniqueCode = idGeneratorService.generateUniqueCode();
 		UrlEntity entity = new UrlEntity();
+		entity.setId(UUID.randomUUID());
 		entity.setOriginalUrl(originalUrl);
 		entity.setUniqueCode(uniqueCode);
 		urlRepository.save(entity);
