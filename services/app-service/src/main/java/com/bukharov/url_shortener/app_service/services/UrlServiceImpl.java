@@ -28,6 +28,10 @@ class UrlServiceImpl implements UrlService {
 
 	@Override
 	public String getByUniqueCode(String uniqueCode) {
-		return uniqueCode;
+		UrlEntity urlEntity = urlRepository.findByUniqueCode(uniqueCode);
+		if (urlEntity == null) {
+			throw new IllegalArgumentException("No URL found for the given unique code");
+		}
+		return urlEntity.getOriginalUrl();
 	}
 }
