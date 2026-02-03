@@ -38,9 +38,13 @@ services:
       depends_on:
         cassandra-init:
           condition: service_completed_successfully
+      ports:
+        - "5005:5005"
       environment:
-        - CASSANDRA_CONTACT_POINTS=cassandra
-        - CASSANDRA_PORT=9042
+        JAVA_TOOL_OPTIONS: >
+          -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+        CASSANDRA_CONTACT_POINTS: cassandra
+        CASSANDRA_PORT: 9042
       networks: [appnet]
 networks:
   appnet:
