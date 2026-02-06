@@ -38,8 +38,9 @@ services:
       depends_on:
         cassandra-init:
           condition: service_completed_successfully
-      ports:
-        - "5005:5005"
+      # Debug port, cannot be used with scaleing
+      # ports:
+      #   - "5005:5005"
       environment:
         JAVA_TOOL_OPTIONS: >
           -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
