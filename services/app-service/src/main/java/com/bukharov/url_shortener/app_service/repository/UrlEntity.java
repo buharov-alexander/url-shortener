@@ -11,7 +11,6 @@ import org.springframework.data.cassandra.core.mapping.Table;
 public class UrlEntity {
 
 	@PrimaryKey
-	private UUID id;
-	private String originalUrl;
 	private String uniqueCode;
+	private String originalUrl;
 }

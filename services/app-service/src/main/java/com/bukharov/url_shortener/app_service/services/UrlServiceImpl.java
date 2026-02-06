@@ -19,9 +19,8 @@ class UrlServiceImpl implements UrlService {
 	public String saveUniqueCode(String originalUrl) {
 		String uniqueCode = idGeneratorService.generateUniqueCode();
 		UrlEntity entity = new UrlEntity();
-		entity.setId(UUID.randomUUID());
-		entity.setOriginalUrl(originalUrl);
 		entity.setUniqueCode(uniqueCode);
+		entity.setOriginalUrl(originalUrl);
 		urlRepository.save(entity);
 		return uniqueCode;
 	}
