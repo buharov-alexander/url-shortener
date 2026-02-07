@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Snowflake {
 
     // Constants for bit allocation
-    private static final long EPOCH = 1288834974657L; // Twitter Snowflake epoch (2010-11-04)
+    private static final long EPOCH = 1609459200000L; // Custom epoch (January 1, 2021)
     private static final int TIMESTAMP_BITS = 41;
     private static final int NODE_BITS = 10;
     private static final int SEQUENCE_BITS = 12;
