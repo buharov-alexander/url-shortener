@@ -1,4 +1,3 @@
-// ...existing code...
 # URL Shortener
 
 [Russian version](README.ru.md)
