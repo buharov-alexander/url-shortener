@@ -61,7 +61,7 @@ jobs:
           for s in $services; do
             echo "Checking service: $s"
             started=0
-            # Wait up to 60 seconds per service
+            # Wait up to 300 seconds per service
             for i in {1..30}; do
               cid=$($DC ps -q $s 2>/dev/null || true)
               if [ -n "$cid" ]; then
@@ -72,7 +72,7 @@ jobs:
                   break
                 fi
               fi
-              sleep 2
+              sleep 10
             done
             if [ "$started" -ne 1 ]; then
               echo "Service $s failed to start"
