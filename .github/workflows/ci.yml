@@ -60,25 +60,71 @@ jobs:
 
           for s in $services; do
             echo "Checking service: $s"
-            started=0
-            # Wait up to 300 seconds per service
-            for i in {1..30}; do
-              cid=$($DC ps -q $s 2>/dev/null || true)
-              if [ -n "$cid" ]; then
-                running=$(docker inspect -f '{{.State.Running}}' "$cid" 2>/dev/null || echo false)
-                if [ "$running" = "true" ]; then
-                  started=1
-                  echo "Service $s is running (container $cid)"
-                  break
+            
+            # cassandra-init is a one-time service that should complete successfully
+            if [ "$s" = "cassandra-init" ]; then
+              completed=0
+              # Wait up to 300 seconds for cassandra-init to complete
+              for i in {1..30}; do
+                # Check both running and stopped containers
+                cid=$($DC ps -a -q $s 2>/dev/null | head -n1 || true)
+                if [ -n "$cid" ]; then
+                  running=$(docker inspect -f '{{.State.Running}}' "$cid" 2>/dev/null || echo false)
+                  exit_code=$(docker inspect -f '{{.State.ExitCode}}' "$cid" 2>/dev/null || echo "")
+                  
+                  # If container has stopped and exit code is 0, it completed successfully
+                  if [ "$running" = "false" ] && [ "$exit_code" = "0" ]; then
+                    completed=1
+                    echo "Service $s completed successfully (container $cid)"
+                    break
+                  # If container stopped with non-zero exit code, it failed
+                  elif [ "$running" = "false" ] && [ -n "$exit_code" ] && [ "$exit_code" != "0" ] && [ "$exit_code" != "-1" ]; then
+                    echo "Service $s exited with code $exit_code"
+                    echo "Logs for $s:"
+                    docker logs "$cid" || true
+                    exit 1
+                  fi
                 fi
+                sleep 10
+              done
+              if [ "$completed" -ne 1 ]; then
+                echo "Service $s failed to complete"
+                $DC ps -a || true
+                docker ps -a || true
+                cid=$($DC ps -a -q $s 2>/dev/null | head -n1 || true)
+                if [ -n "$cid" ]; then
+                  echo "Logs for $s:"
+                  docker logs "$cid" || true
+                fi
+                exit 1
               fi
-              sleep 10
-            done
-            if [ "$started" -ne 1 ]; then
-              echo "Service $s failed to start"
-              $DC ps || true
-              docker ps || true
-              exit 1
+            else
+              # For other services, check if they're running
+              started=0
+              # Wait up to 300 seconds per service
+              for i in {1..30}; do
+                cid=$($DC ps -q $s 2>/dev/null || true)
+                if [ -n "$cid" ]; then
+                  running=$(docker inspect -f '{{.State.Running}}' "$cid" 2>/dev/null || echo false)
+                  if [ "$running" = "true" ]; then
+                    started=1
+                    echo "Service $s is running (container $cid)"
+                    break
+                  fi
+                fi
+                sleep 10
+              done
+              if [ "$started" -ne 1 ]; then
+                echo "Service $s failed to start"
+                $DC ps || true
+                docker ps || true
+                cid=$($DC ps -a -q $s 2>/dev/null | head -n1 || true)
+                if [ -n "$cid" ]; then
+                  echo "Logs for $s:"
+                  docker logs "$cid" || true
+                fi
+                exit 1
+              fi
             fi
           done
 
