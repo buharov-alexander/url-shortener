@@ -1,4 +1,5 @@
 # URL Shortener
+[![CI](https://github.com/buharov-alexander/url-shortener/actions/workflows/ci.yml/badge.svg)](https://github.com/buharov-alexander/url-shortener/actions/workflows/ci.yml)
 
 [Russian version](README.ru.md)
 
