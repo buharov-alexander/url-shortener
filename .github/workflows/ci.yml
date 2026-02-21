@@ -131,3 +131,82 @@ jobs:
       - name: Show docker compose ps
         run: |
           docker compose ps
+
+      - name: Integration test - Shorten URL and redirect
+        run: |
+          set -euo pipefail
+          
+          # Wait for application to be ready
+          echo "Waiting for application to be ready..."
+          for i in {1..30}; do
+            if curl -f -s http://localhost/actuator/health > /dev/null 2>&1; then
+              echo "Application is ready"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Application failed to become ready"
+              docker compose logs app-service || true
+              exit 1
+            fi
+            echo "Waiting for application... ($i/30)"
+            sleep 5
+          done
+          
+          # Test data
+          ORIGINAL_URL="https://www.example.com/very/long/path?param=value"
+          
+          # Step 1: POST request to shorten URL
+          echo "Making POST request to shorten URL..."
+          RESPONSE=$(curl -s -X POST http://localhost/url \
+            -H "Content-Type: application/json" \
+            -d "{\"url\": \"$ORIGINAL_URL\"}")
+          
+          echo "POST response: $RESPONSE"
+          
+          # Extract shortenUrl from JSON response using Python
+          SHORTEN_URL=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin)['url'])")
+          
+          if [ -z "$SHORTEN_URL" ]; then
+            echo "Failed to extract shortenUrl from response: $RESPONSE"
+            exit 1
+          fi
+          
+          echo "Shorten URL: $SHORTEN_URL"
+          
+          # Extract uniqueCode from shortenUrl (format: http://host/url/{uniqueCode})
+          UNIQUE_CODE=$(echo "$SHORTEN_URL" | sed 's|.*/url/||')
+          
+          if [ -z "$UNIQUE_CODE" ]; then
+            echo "Failed to extract uniqueCode from shortenUrl: $SHORTEN_URL"
+            exit 1
+          fi
+          
+          echo "Unique code: $UNIQUE_CODE"
+          
+          # Step 2: GET request to check redirect (without following redirect)
+          echo "Making GET request to check redirect..."
+          GET_RESPONSE=$(curl -s -w "\n%{http_code}" -I http://localhost/url/"$UNIQUE_CODE")
+          GET_HTTP_CODE=$(echo "$GET_RESPONSE" | tail -n1)
+          GET_HEADERS=$(echo "$GET_RESPONSE" | sed '$d')
+          
+          LOCATION=$(echo "$GET_HEADERS" | grep -i "^location:" | cut -d' ' -f2- | tr -d '\r')
+          
+          echo "GET status code: $GET_HTTP_CODE"
+          echo "Location header: $LOCATION"
+          
+          # Verify redirect
+          if [ "$GET_HTTP_CODE" != "301" ]; then
+            echo "❌ Expected status code 301, got $GET_HTTP_CODE"
+            echo "Response headers: $GET_HEADERS"
+            docker compose logs app-service || true
+            exit 1
+          fi
+          
+          if [ "$LOCATION" != "$ORIGINAL_URL" ]; then
+            echo "❌ Expected Location header: $ORIGINAL_URL"
+            echo "Got Location header: $LOCATION"
+            docker compose logs app-service || true
+            exit 1
+          fi
+          
+          echo "✓ Integration test passed: URL shortened and redirect works correctly"
