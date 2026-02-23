@@ -14,6 +14,11 @@ public class IdGeneratorService {
 		this.snowflake = new Snowflake(getNodeId());
 	}
 
+	/**
+	 * Generates a unique code based on a Snowflake ID and encodes it to Base62.
+	 * Thread-safe.
+	 * @return A unique code
+	 */
 	public String generateUniqueCode() {
 		// Generate Snowflake ID
 		long snowflakeId = snowflake.nextId();
